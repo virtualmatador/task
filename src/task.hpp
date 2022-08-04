@@ -2,6 +2,7 @@
 #define TASK_H
 
 #include <functional>
+#include <iostream>
 #include <map>
 #include <mutex>
 #include <optional>
@@ -101,7 +102,14 @@ public:
             auto handler = std::move(std::get<1>(task->second));
             tasks_.erase(task);
             auto_lock.unlock();
-            handler(std::move(payload));
+            try
+            {
+                handler(std::move(payload));
+            }
+            catch(const std::exception& e)
+            {
+                std::cerr << "Error: " << e.what() << std::endl;
+            }
         }
     }
 };
