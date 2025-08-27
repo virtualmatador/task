@@ -1,5 +1,5 @@
-#ifndef TASK_H
-#define TASK_H
+#ifndef TASK_HPP
+#define TASK_HPP
 
 #include <functional>
 #include <iostream>
@@ -19,7 +19,7 @@ private:
     std::size_t index_;
     std::size_t progress_;
     std::map<std::size_t, std::tuple<
-        I, std::function<void(O&&)>, boost::asio::deadline_timer>> tasks_;
+        I, std::move_only_function<void(O&&)>, boost::asio::deadline_timer>> tasks_;
     std::mutex tasks_lock_;
 
 public:
@@ -36,7 +36,7 @@ public:
     }
 
     std::size_t push(I&& input, std::size_t timeout_seconds,
-        std::function<void(O&&)>&& handler)
+        std::move_only_function<void(O&&)>&& handler)
     {
         std::unique_lock auto_lock{ tasks_lock_ };
         auto id = ++index_;
@@ -114,4 +114,4 @@ public:
     }
 };
 
-#endif // TASK_H
+#endif // TASK_HPP
